@@ -3,16 +3,20 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Đại Học Duy Tân</title>
     <link rel="icon" href="logo.png" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* Cấu hình cơ bản */
+        /* --- 1. CẤU HÌNH CHUNG --- */
         * {
             box-sizing: border-box;
-            /* Đảm bảo padding không làm vỡ khung */
+            outline: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html,
@@ -21,29 +25,22 @@
             padding: 0;
             width: 100%;
             min-height: 100vh;
-            /* Chiều cao tối thiểu bằng màn hình */
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Nunito', sans-serif;
             display: flex;
             flex-direction: column;
-            /* Xếp dọc để quản lý footer dễ hơn */
             align-items: center;
-
-            /* Background màu sắc */
-            background: linear-gradient(45deg,
-                    red, orange, yellow, rgb(164, 246, 164), cyan, rgb(142, 142, 241), violet, red);
+            /* Nền Gradient nhẹ nhàng */
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1, #fbc2eb);
             background-size: 400% 400%;
-            animation: rainbow 60s ease infinite;
-
-            /* QUAN TRỌNG: Cho phép cuộn nếu nội dung dài hơn màn hình */
+            animation: gradientBG 15s ease infinite;
             overflow-y: auto;
-            overflow-x: hidden;
-            /* Chặn cuộn ngang */
+            color: #333;
         }
 
-        @keyframes rainbow {
+        @keyframes gradientBG {
             0% {
                 background-position: 0% 50%;
             }
@@ -57,61 +54,101 @@
             }
         }
 
-        /* Container chính */
         .container {
             flex: 1;
-            /* Chiếm toàn bộ khoảng trống còn lại để đẩy footer xuống */
             width: 100%;
-            max-width: 1100px;
-            padding: 40px 15px;
-            /* Thêm padding trên dưới để khi cuộn không bị sát mép */
+            max-width: 1000px;
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            /* Căn giữa dọc nếu màn hình to */
             align-items: center;
-            animation: fadeIn 0.8s ease-out;
         }
 
+        /* --- 2. LOGO (ĐÃ NÂNG CẤP ĐỘ NÉT) --- */
         .logo-area {
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Giữ yêu cầu lệch phải nhẹ của bạn trên PC */
             padding-left: 20px;
+
+            /* Animation logo trôi nhẹ */
+            animation: floatLogo 3s ease-in-out infinite;
+        }
+
+        @keyframes floatLogo {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
         }
 
         .logo-area img {
             max-width: 220px;
             width: 100%;
-            /* Responsive ảnh */
             height: auto;
             display: block;
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+
+            /* --- THỦ THUẬT LÀM NÉT ẢNH --- */
+            /* 1. Ép trình duyệt vẽ cạnh sắc nét hơn */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+
+            /* 2. Tăng tương phản 15% và bão hòa màu 10% để ảnh trong trẻo hơn */
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.15)) contrast(1.15) saturate(1.1);
+
+            /* 3. Kích hoạt GPU render để mượt hơn */
+            transform: translateZ(0);
         }
 
+        /* --- 3. ĐỒNG HỒ --- */
+        .time-container {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        #clock {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        #date {
+            font-size: 16px;
+            font-weight: 700;
+            opacity: 1;
+            text-transform: capitalize;
+        }
+
+        /* --- 4. LAYOUT 2 CỘT --- */
         .columns-wrapper {
             display: flex;
             flex-direction: row;
             width: 100%;
             justify-content: center;
             gap: 40px;
-            flex-wrap: wrap;
-            /* Cho phép rớt dòng nếu màn hình quá hẹp (tablet dọc) */
         }
 
         .column {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            min-width: 300px;
-            /* Đảm bảo cột không bị bóp quá nhỏ */
+            gap: 16px;
+            max-width: 400px;
         }
 
-        /* Căn chỉnh trên PC */
         .column:first-child {
             align-items: flex-end;
         }
@@ -120,65 +157,89 @@
             align-items: flex-start;
         }
 
+        /* --- 5. TIÊU ĐỀ CỘT --- */
+        .section-title {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8B0000;
+            margin-bottom: 10px;
+            font-weight: 800;
+            width: 100%;
+            text-align: center;
+            opacity: 1;
+        }
+
+        /* --- 6. NÚT BẤM --- */
         .btn {
             display: flex;
             align-items: center;
             justify-content: flex-start;
             text-align: left;
-
             width: 100%;
-            /* Nút co giãn theo cột */
-            max-width: 340px;
-            /* Giới hạn độ rộng tối đa */
+            max-width: 380px;
+            padding: 16px 20px;
 
-            padding: 12px 15px;
             font-size: 16px;
             font-weight: 700;
-            color: #000;
-            background: transparent;
-            border: none;
-            cursor: pointer;
+            color: #222;
             text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-            text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.9), 0px 0px 8px rgba(255, 255, 255, 0.6);
 
-            /* Xử lý text dài quá */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 18px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+            opacity: 0;
+            animation: slideIn 0.5s ease-out forwards;
         }
 
-        .btn i {
-            margin-right: 15px;
-            font-size: 20px;
-            width: 25px;
-            text-align: center;
-            flex-shrink: 0;
+        .column:first-child .btn:nth-of-type(1) {
+            animation-delay: 0.1s;
         }
 
-        .btn:hover {
-            transform: scale(1.05);
-            color: #800000;
-            text-shadow: 0px 0px 15px rgba(255, 255, 255, 1);
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50px;
+        .column:first-child .btn:nth-of-type(2) {
+            animation-delay: 0.2s;
         }
 
-        /* Footer linh hoạt: Nằm dưới cùng container */
-        .footer {
-            padding: 15px;
-            width: 100%;
-            text-align: center;
-            font-size: 13px;
-            color: #000;
-            font-weight: bold;
-            text-shadow: 0 0 3px #fff;
-            flex-shrink: 0;
-            /* Không bị co lại */
+        .column:first-child .btn:nth-of-type(3) {
+            animation-delay: 0.3s;
         }
 
-        @keyframes fadeIn {
+        .column:first-child .btn:nth-of-type(4) {
+            animation-delay: 0.4s;
+        }
+
+        .column:first-child .btn:nth-of-type(5) {
+            animation-delay: 0.5s;
+        }
+
+        .column:last-child .btn:nth-of-type(1) {
+            animation-delay: 0.15s;
+        }
+
+        .column:last-child .btn:nth-of-type(2) {
+            animation-delay: 0.25s;
+        }
+
+        .column:last-child .btn:nth-of-type(3) {
+            animation-delay: 0.35s;
+        }
+
+        .column:last-child .btn:nth-of-type(4) {
+            animation-delay: 0.45s;
+        }
+
+        .column:last-child .btn:nth-of-type(5) {
+            animation-delay: 0.55s;
+        }
+
+        @keyframes slideIn {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -190,7 +251,122 @@
             }
         }
 
-        /* Tùy chỉnh thanh cuộn cho đẹp (ẩn đi nhưng vẫn cuộn được) */
+        .btn i {
+            margin-right: 18px;
+            font-size: 22px;
+            width: 30px;
+            text-align: center;
+            flex-shrink: 0;
+            color: #8B0000;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(151, 250, 144, 0.95);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+            color: #8B0000;
+            border-color: red;
+        }
+
+        .btn:hover i {
+            transform: scale(1.2) rotate(-10deg);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* --- 7. FOOTER --- */
+        .footer {
+            padding: 25px 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            color: #444;
+            font-weight: 600;
+            animation: fadeIn 1s ease-out 1s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* --- 8. RESPONSIVE --- */
+        @media (max-width: 850px) {
+            .container {
+                padding-top: 40px;
+            }
+
+            .columns-wrapper {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .column {
+                width: 100%;
+                max-width: 450px;
+                align-items: center !important;
+            }
+
+            .btn {
+                justify-content: center;
+                max-width: 100%;
+            }
+
+            .logo-area {
+                padding-left: 0;
+                margin-bottom: 20px;
+            }
+
+            #clock {
+                font-size: 32px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .logo-area img {
+                max-width: 180px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+
+            #clock {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .container {
+                padding-top: 10px;
+            }
+
+            .logo-area img {
+                max-width: 120px;
+            }
+
+            .time-container {
+                margin-bottom: 15px;
+            }
+
+            #clock {
+                font-size: 24px;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                font-size: 13px;
+                margin: 0;
+            }
+        }
+
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -200,92 +376,8 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-        }
-
-        /* --- RESPONSIVE MEDIA QUERIES --- */
-
-        /* 1. Tablet & Mobile (Dưới 850px) */
-        @media (max-width: 850px) {
-            .container {
-                justify-content: flex-start;
-                /* Để nội dung bắt đầu từ trên xuống, tiện cho việc cuộn */
-                padding-top: 60px;
-                /* Cách lề trên một chút */
-            }
-
-            .columns-wrapper {
-                flex-direction: column;
-                /* Chuyển thành 1 cột dọc */
-                align-items: center;
-                gap: 15px;
-            }
-
-            .column {
-                width: 100%;
-                min-width: auto;
-                /* Bỏ min-width để co giãn theo màn hình */
-                align-items: center !important;
-                /* Căn giữa tất cả */
-            }
-
-            .logo-area {
-                padding-left: 0;
-                /* Bỏ lệch phải */
-                margin-bottom: 30px;
-            }
-
-            .btn {
-                justify-content: center;
-                /* Chữ ra giữa */
-                max-width: 90%;
-                /* Nút rộng gần bằng màn hình */
-                background-color: rgba(255, 255, 255, 0.1);
-                /* Thêm nền mờ nhẹ để dễ bấm trên mobile */
-                border-radius: 50px;
-            }
-        }
-
-        /* 2. Màn hình Siêu Bé (iPhone 5/SE/Fold - Dưới 380px) */
-        @media (max-width: 380px) {
-            .logo-area img {
-                max-width: 150px;
-                /* Logo nhỏ lại */
-            }
-
-            .btn {
-                font-size: 14px;
-                /* Chữ nhỏ lại */
-                padding: 10px 5px;
-            }
-
-            .btn i {
-                font-size: 16px;
-                margin-right: 8px;
-            }
-        }
-
-        /* 3. Màn hình xoay ngang (Chiều cao thấp - Dưới 600px) */
-        @media (max-height: 600px) {
-            .container {
-                padding-top: 20px;
-                justify-content: flex-start;
-            }
-
-            .logo-area {
-                margin-bottom: 15px;
-            }
-
-            .logo-area img {
-                max-width: 120px;
-            }
-
-            .btn {
-                padding: 8px 10px;
-                font-size: 14px;
-                margin: 0;
-            }
         }
     </style>
 </head>
@@ -297,9 +389,16 @@
             <img src="logotrangchu.png" alt="Logo Đại Học Duy Tân">
         </div>
 
+        <div class="time-container">
+            <div id="clock">00:00:00</div>
+            <div id="date">Đang tải...</div>
+        </div>
+
         <div class="columns-wrapper">
 
             <div class="column">
+                <div class="section-title">HỌC VỤ & ĐÀO TẠO</div>
+
                 <a href="https://mydtu.duytan.edu.vn/Signin.aspx" class="btn">
                     <i class="fas fa-home"></i> Cổng thông tin ĐH Duy Tân
                 </a>
@@ -317,11 +416,13 @@
                 </a>
 
                 <a href="https://pdaotao.duytan.edu.vn/EXAM_LIST/Default.aspx?lang=VN" class="btn">
-                    <i class="fa-solid fa-globe"></i> Danh Sách Thi phòng Đào Tạo
+                    <i class="fa-solid fa-globe"></i> Danh Sách Thi P.Đào Tạo
                 </a>
             </div>
 
             <div class="column">
+                <div class="section-title">CỘNG ĐỒNG & KẾT NỐI</div>
+
                 <a href="https://t.me/s/Dai_Hoc_Duy_Tan" class="btn">
                     <i class="fab fa-telegram-plane"></i> DTU Official Community
                 </a>
@@ -346,7 +447,7 @@
     </div>
 
     <div class="footer">
-        &copy; Trang miễn trừ trách nhiệm khi có sự sai lệch
+        © Thông tin chỉ mang tính chất tham khảo & hỗ trợ cộng đồng
     </div>
 
     <script>
@@ -356,6 +457,15 @@
                 e.preventDefault();
             }
         });
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
+            const dateStr = now.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' });
+            document.getElementById('date').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 
 </body>
