@@ -3,35 +3,44 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Đại Học Duy Tân</title>
     <link rel="icon" href="logo.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* 🔒 KHÔNG CHO CUỘN BODY (Giữ nguyên màn hình ứng dụng) */
+        /* Cấu hình cơ bản */
+        * {
+            box-sizing: border-box;
+            /* Đảm bảo padding không làm vỡ khung */
+        }
+
         html,
         body {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
-            overflow: hidden;
-            /* Chặn cuộn trang web chính */
+            min-height: 100vh;
+            /* Chiều cao tối thiểu bằng màn hình */
         }
 
         body {
-            touch-action: none;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
+            flex-direction: column;
+            /* Xếp dọc để quản lý footer dễ hơn */
             align-items: center;
-            justify-content: center;
-            height: 100vh;
 
-            /* Nền cầu vồng */
+            /* Background màu sắc */
             background: linear-gradient(45deg,
                     red, orange, yellow, rgb(164, 246, 164), cyan, rgb(142, 142, 241), violet, red);
             background-size: 400% 400%;
             animation: rainbow 60s ease infinite;
+
+            /* QUAN TRỌNG: Cho phép cuộn nếu nội dung dài hơn màn hình */
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Chặn cuộn ngang */
         }
 
         @keyframes rainbow {
@@ -48,111 +57,125 @@
             }
         }
 
+        /* Container chính */
         .container {
-            /* padding: 40px;  --> Đổi thành padding linh hoạt bên dưới */
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-
-            /* QUAN TRỌNG: Giới hạn chiều cao và cho phép cuộn nội dung */
-            max-height: 95vh;
-            /* Không bao giờ cao quá 95% màn hình */
-            overflow-y: auto;
-            /* Tự hiện thanh cuộn nếu nội dung dài quá màn hình */
-
-            /* Ẩn thanh cuộn cho đẹp nhưng vẫn cuộn được */
-            scrollbar-width: none;
-            /* Firefox */
-            -ms-overflow-style: none;
-            /* IE/Edge */
-
-            transition: transform 0.3s ease;
-            animation: fadeIn 0.8s ease-out;
-
-            /* Giúp căn chỉnh layout bên trong tốt hơn */
+            flex: 1;
+            /* Chiếm toàn bộ khoảng trống còn lại để đẩy footer xuống */
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px 15px;
+            /* Thêm padding trên dưới để khi cuộn không bị sát mép */
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }
-
-        /* Ẩn thanh cuộn trên Chrome/Safari/Opera */
-        .container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .container:hover {
-            transform: translateY(-2px);
-            /* Giảm độ nảy để đỡ bị lỗi trên mobile */
+            /* Căn giữa dọc nếu màn hình to */
+            align-items: center;
+            animation: fadeIn 0.8s ease-out;
         }
 
         .logo-area {
-            margin-bottom: 20px;
-            flex-shrink: 0;
-            /* Không cho logo bị bóp méo */
+            margin-bottom: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Giữ yêu cầu lệch phải nhẹ của bạn trên PC */
+            padding-left: 20px;
         }
 
         .logo-area img {
-            max-width: 180px;
+            max-width: 220px;
+            width: 100%;
+            /* Responsive ảnh */
             height: auto;
             display: block;
-            margin: 0 auto;
             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
-            transition: max-width 0.3s ease;
-            /* Hiệu ứng thu nhỏ mượt */
         }
 
-        .btn-group {
+        .columns-wrapper {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            /* Cho phép rớt dòng nếu màn hình quá hẹp (tablet dọc) */
+        }
+
+        .column {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            width: 100%;
+            gap: 15px;
+            min-width: 300px;
+            /* Đảm bảo cột không bị bóp quá nhỏ */
+        }
+
+        /* Căn chỉnh trên PC */
+        .column:first-child {
+            align-items: flex-end;
+        }
+
+        .column:last-child {
+            align-items: flex-start;
         }
 
         .btn {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 15px 10px;
+            justify-content: flex-start;
+            text-align: left;
+
+            width: 100%;
+            /* Nút co giãn theo cột */
+            max-width: 340px;
+            /* Giới hạn độ rộng tối đa */
+
+            padding: 12px 15px;
             font-size: 16px;
             font-weight: 700;
             color: #000;
             background: transparent;
             border: none;
-            border-radius: 50px;
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s ease;
             position: relative;
-            text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.8),
-                0px 0px 2px rgba(255, 255, 255, 1);
+            text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.9), 0px 0px 8px rgba(255, 255, 255, 0.6);
 
-            flex-shrink: 0;
-            /* Đảm bảo nút không bị bóp dẹp */
+            /* Xử lý text dài quá */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .btn i {
-            margin-right: 10px;
-            font-size: 18px;
+            margin-right: 15px;
+            font-size: 20px;
+            width: 25px;
+            text-align: center;
+            flex-shrink: 0;
         }
 
         .btn:hover {
-            transform: scale(1.02);
-            /* Giảm độ scale chút cho mobile đỡ lag */
+            transform: scale(1.05);
             color: #800000;
-            text-shadow: 0px 0px 10px rgba(255, 255, 255, 1);
+            text-shadow: 0px 0px 15px rgba(255, 255, 255, 1);
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
         }
 
+        /* Footer linh hoạt: Nằm dưới cùng container */
         .footer {
-            margin-top: 30px;
-            margin-bottom: 10px;
-            /* Thêm lề dưới để không sát mép khi cuộn */
-            font-size: 12px;
+            padding: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
             color: #000;
             font-weight: bold;
-            text-shadow: 0 0 2px #fff;
+            text-shadow: 0 0 3px #fff;
             flex-shrink: 0;
+            /* Không bị co lại */
         }
 
         @keyframes fadeIn {
@@ -167,57 +190,101 @@
             }
         }
 
-        /* --- MEDIA QUERY CHO MÀN HÌNH NHỎ (MOBILE) --- */
-        /* Khi màn hình cao dưới 700px hoặc rộng dưới 400px */
-        @media (max-height: 700px),
-        (max-width: 400px) {
+        /* Tùy chỉnh thanh cuộn cho đẹp (ẩn đi nhưng vẫn cuộn được) */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+
+        /* 1. Tablet & Mobile (Dưới 850px) */
+        @media (max-width: 850px) {
             .container {
-                padding: 10px;
-                /* Giảm lề khung */
-                width: 95%;
-                /* Mở rộng chiều ngang */
+                justify-content: flex-start;
+                /* Để nội dung bắt đầu từ trên xuống, tiện cho việc cuộn */
+                padding-top: 60px;
+                /* Cách lề trên một chút */
+            }
+
+            .columns-wrapper {
+                flex-direction: column;
+                /* Chuyển thành 1 cột dọc */
+                align-items: center;
+                gap: 15px;
+            }
+
+            .column {
+                width: 100%;
+                min-width: auto;
+                /* Bỏ min-width để co giãn theo màn hình */
+                align-items: center !important;
+                /* Căn giữa tất cả */
             }
 
             .logo-area {
-                margin-bottom: 10px;
-                /* Giảm khoảng cách logo */
-            }
-
-            .logo-area img {
-                max-width: 120px;
-                /* Thu nhỏ logo */
+                padding-left: 0;
+                /* Bỏ lệch phải */
+                margin-bottom: 30px;
             }
 
             .btn {
-                padding: 10px 5px;
-                /* Nút gọn lại */
+                justify-content: center;
+                /* Chữ ra giữa */
+                max-width: 90%;
+                /* Nút rộng gần bằng màn hình */
+                background-color: rgba(255, 255, 255, 0.1);
+                /* Thêm nền mờ nhẹ để dễ bấm trên mobile */
+                border-radius: 50px;
+            }
+        }
+
+        /* 2. Màn hình Siêu Bé (iPhone 5/SE/Fold - Dưới 380px) */
+        @media (max-width: 380px) {
+            .logo-area img {
+                max-width: 150px;
+                /* Logo nhỏ lại */
+            }
+
+            .btn {
                 font-size: 14px;
                 /* Chữ nhỏ lại */
-                gap: 5px;
-                /* Khoảng cách giữa các nút sát hơn */
+                padding: 10px 5px;
             }
 
             .btn i {
                 font-size: 16px;
-                /* Icon nhỏ lại */
-                margin-right: 5px;
-            }
-
-            .footer {
-                margin-top: 15px;
-                font-size: 11px;
+                margin-right: 8px;
             }
         }
 
-        /* Chế độ màn hình Siêu Nhỏ (iPhone SE đời đầu hoặc gập lại) */
-        @media (max-height: 500px) {
+        /* 3. Màn hình xoay ngang (Chiều cao thấp - Dưới 600px) */
+        @media (max-height: 600px) {
+            .container {
+                padding-top: 20px;
+                justify-content: flex-start;
+            }
+
+            .logo-area {
+                margin-bottom: 15px;
+            }
+
             .logo-area img {
-                max-width: 90px;
+                max-width: 120px;
             }
 
             .btn {
-                padding: 8px 2px;
-                font-size: 13px;
+                padding: 8px 10px;
+                font-size: 14px;
+                margin: 0;
             }
         }
     </style>
@@ -230,39 +297,56 @@
             <img src="logotrangchu.png" alt="Logo Đại Học Duy Tân">
         </div>
 
-        <div class="btn-group">
-            <a href="https://mydtu.duytan.edu.vn/Signin.aspx" class="btn">
-                <i class="fas fa-home"></i> Cổng thông tin ĐH Duy Tân
-            </a>
+        <div class="columns-wrapper">
 
-            <a href="lichthi.html" class="btn">
-                <i class="fa-regular fa-calendar-days"></i> Lịch Thi
-            </a>
+            <div class="column">
+                <a href="https://mydtu.duytan.edu.vn/Signin.aspx" class="btn">
+                    <i class="fas fa-home"></i> Cổng thông tin ĐH Duy Tân
+                </a>
 
-            <a href="danhsachthi.html" class="btn">
-                <i class="fa-solid fa-list-check"></i> Danh Sách Thi
-            </a>
+                <a href="lichthi.html" class="btn">
+                    <i class="fa-regular fa-calendar-days"></i> Lịch Thi
+                </a>
 
-            <a href="https://pdaotao.duytan.edu.vn/ANNOUNCEMENT/Default.aspx?lang=VN" class="btn">
-                <i class="fa-regular fa-bell"></i> Thông báo phòng Đào Tạo
-            </a>
+                <a href="danhsachthi.html" class="btn">
+                    <i class="fa-solid fa-list-check"></i> Danh Sách Thi
+                </a>
 
-            <a href="https://pdaotao.duytan.edu.vn/EXAM_LIST/Default.aspx?lang=VN" class="btn">
-                <i class="fa-solid fa-globe"></i> Danh Sách Thi phòng Đào Tạo
-            </a>
+                <a href="https://pdaotao.duytan.edu.vn/ANNOUNCEMENT/Default.aspx?lang=VN" class="btn">
+                    <i class="fa-regular fa-bell"></i> Thông báo phòng Đào Tạo
+                </a>
 
-            <a href="https://t.me/s/Dai_Hoc_Duy_Tan" class="btn">
-                <i class="fab fa-telegram-plane"></i> DTU Official Community
-            </a>
+                <a href="https://pdaotao.duytan.edu.vn/EXAM_LIST/Default.aspx?lang=VN" class="btn">
+                    <i class="fa-solid fa-globe"></i> Danh Sách Thi phòng Đào Tạo
+                </a>
+            </div>
 
-            <a href="https://t.me/chatsinhvienDTU" class="btn">
-                <i class="fab fa-telegram-plane"></i> Chat DTU
-            </a>
+            <div class="column">
+                <a href="https://t.me/s/Dai_Hoc_Duy_Tan" class="btn">
+                    <i class="fab fa-telegram-plane"></i> DTU Official Community
+                </a>
+
+                <a href="https://t.me/chatsinhvienDTU" class="btn">
+                    <i class="fab fa-telegram-plane"></i> Chat DTU
+                </a>
+
+                <a href="https://www.facebook.com/groups/sinhviendtu" class="btn">
+                    <i class="fa-brands fa-facebook"></i> Groups facebook Duy Tân
+                </a>
+
+                <a href="https://m.me/ch/Abbuj41p46CryBBU/" class="btn">
+                    <i class="fa-brands fa-facebook-messenger"></i> Kênh 🎓DTU Community
+                </a>
+
+                <a href="https://m.me/ch/AbZLMAFZlqTfbFNj/" class="btn">
+                    <i class="fa-brands fa-facebook-messenger"></i> Chat 🎓DTU Community
+                </a>
+            </div>
         </div>
+    </div>
 
-        <div class="footer">
-            &copy; Trang miễn trừ trách nhiệm khi có sự sai lệch
-        </div>
+    <div class="footer">
+        &copy; Trang miễn trừ trách nhiệm khi có sự sai lệch
     </div>
 
     <script>
