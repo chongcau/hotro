@@ -1,6 +1,6 @@
 const LOCK_CONFIG = {
-    startTime: "23:00",
-    endTime: "00:00",
+    startTime: "22:30",
+    endTime: "05:30",
 
     redirectLink: "https://t.me/Dai_Hoc_Duy_Tan",
     message: "HỆ THỐNG TẠM KHÓA",
