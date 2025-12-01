@@ -264,52 +264,73 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // =========================================================================
-    // --- HÀM XỬ LÝ CHỤP ẢNH THẺ (ĐÃ CẬP NHẬT: TỰ ĐỘNG BUNG NỘI DUNG) ---
+    // --- HÀM XỬ LÝ CHỤP ẢNH
     // =========================================================================
     function handleCopyCard(button) {
         const card = button.closest('.result-item');
-        // Chỉ target phần nội dung câu trả lời (result-answer) để chụp
-        const answerDivToCapture = card.querySelector('.result-answer');
+        const originalAnswerDiv = card.querySelector('.result-answer');
 
-        if (!answerDivToCapture) return;
+        if (!originalAnswerDiv) return;
 
         const originalButtonContent = button.innerHTML;
         button.innerHTML = '⏳'; // Hiện icon chờ
 
-        // 1. THÊM CLASS ĐỂ "BUNG" HẾT NỘI DUNG RA TRƯỚC KHI CHỤP
-        // Class 'force-full-height' phải được định nghĩa trong CSS (như đã hướng dẫn ở bước trước)
-        answerDivToCapture.classList.add('force-full-height');
+        // 1. TẠO BẢN SAO (CLONE) CỦA NỘI DUNG
+        // cloneNode(true) sẽ copy toàn bộ html/text bên trong
+        const clone = originalAnswerDiv.cloneNode(true);
 
-        // Đợi 1 xíu để trình duyệt render xong giao diện đã bung ra rồi mới chụp
-        setTimeout(() => {
-            html2canvas(answerDivToCapture, {
+        // 2. THIẾT LẬP CSS CHO BẢN SAO ĐỂ NÓ BUNG HẾT CỠ
+        // Lấy chiều rộng thực tế của bản gốc để text không bị vỡ dòng
+        const originalWidth = window.getComputedStyle(originalAnswerDiv).width;
+
+        Object.assign(clone.style, {
+            position: 'fixed',      // Cố định để không phụ thuộc vị trí trang
+            top: '-10000px',        // Đẩy ra khỏi màn hình (người dùng không thấy)
+            left: '0',
+            width: originalWidth,   // Giữ nguyên chiều rộng
+            height: 'auto',         // Chiều cao tự do
+            maxHeight: 'none',      // Gỡ bỏ giới hạn chiều cao
+            overflow: 'visible',    // Hiển thị toàn bộ
+            background: '#ffffff',  // Nền trắng
+            zIndex: '-1000',        // Nằm dưới cùng
+            padding: '20px',        // Thêm chút lề cho đẹp
+            border: 'none',
+            fontFamily: "'Inter', sans-serif" // Đảm bảo font chữ đúng
+        });
+
+        // 3. GẮN BẢN SAO VÀO THÂN TRANG (BODY)
+        // Lúc này bản sao nằm ngoài hoàn toàn các thẻ cha bị giới hạn scroll
+        document.body.appendChild(clone);
+
+        // 4. CHỤP ẢNH BẢN SAO
+        // Dùng requestAnimationFrame để đảm bảo trình duyệt đã vẽ xong clone
+        requestAnimationFrame(() => {
+            html2canvas(clone, {
                 useCORS: true,
                 logging: false,
-                scale: 2, // Tăng độ nét
+                scale: 2, // Tăng độ nét (2x)
                 backgroundColor: '#ffffff',
-                // Cho phép chụp chiều cao đầy đủ (scrollHeight)
-                height: answerDivToCapture.scrollHeight,
-                windowHeight: answerDivToCapture.scrollHeight
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight
             }).then(canvas => {
 
-                // 2. CHỤP XONG RỒI THÌ XÓA CLASS ĐI ĐỂ GIAO DIỆN GỌN LẠI
-                answerDivToCapture.classList.remove('force-full-height');
+                // 5. XÓA BẢN SAO SAU KHI CHỤP XONG
+                document.body.removeChild(clone);
 
-                // Chuyển canvas sang Blob (file ảnh)
+                // Xử lý lưu ảnh vào Clipboard
                 canvas.toBlob(function (blob) {
                     if (blob) {
                         try {
-                            // Copy vào Clipboard
                             const item = new ClipboardItem({ 'image/png': blob });
                             navigator.clipboard.write([item]).then(() => {
                                 button.innerHTML = '✅';
                                 setTimeout(() => { button.innerHTML = originalButtonContent; }, 2000);
                             }).catch(err => {
                                 console.error('Lỗi clipboard:', err);
-                                alert("Trình duyệt chặn copy ảnh trực tiếp. Vui lòng tải ảnh về thủ công (nếu cần).");
+                                // Fallback nếu trình duyệt chặn
+                                alert("Đã chụp xong nhưng trình duyệt chặn copy tự động. Bạn có thể lưu ảnh thủ công.");
                                 button.innerHTML = originalButtonContent;
                             });
-
                         } catch (error) {
                             console.error('Lỗi tạo ClipboardItem:', error);
                             button.innerHTML = '❌';
@@ -320,16 +341,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }).catch(err => {
                 console.error('html2canvas lỗi:', err);
-                // Dù lỗi cũng phải xóa class để trả lại giao diện cũ
-                answerDivToCapture.classList.remove('force-full-height');
-
-                alert('Không thể chụp ảnh. Lỗi: ' + err.message);
+                if (document.body.contains(clone)) document.body.removeChild(clone);
                 button.innerHTML = '❌';
                 setTimeout(() => { button.innerHTML = originalButtonContent; }, 2000);
             });
-        }, 100); // Delay 100ms
+        });
     }
-
     // --- CÁC HÀM ĐIỀU KHIỂN POPUP ỦNG HỘ ---
     function showDonateModal() {
         if (donateModal) donateModal.style.display = "flex";
