@@ -35,7 +35,7 @@ const generalInfo = [
     },
     {
         "keywords": ["phòng tài chính", "kế hoạch tài chính", "tài chính", "ví điện tử", "hoàn tiền", "nhận tiền", "chuyển nhầm tiền vào ví điện tử"],
-        "answer": "<strong>Hướng dẫn Nhận tiền nhầm</strong><br><br>" +
+        "answer": "<strong>Hướng dẫn nhận tiền dư(thừa)</strong><br><br>" +
             "Để đăng ký nhận tiền, sinh viên vui lòng thực hiện theo các bước sau:<br><br>" +
             "<strong>Bước 1:</strong> Đến trực tiếp <span style=\"color: #D32F2F;\"><strong>Phòng Kế hoạch Tài chính</strong></span> tại địa chỉ 137 Nguyễn Văn Linh, Thạc Gián, Q. Thanh Khê, Đà Nẵng.<br><br>" +
             "<strong>Bước 2:</strong> Liên hệ bộ phận Kế toán để cung cấp thông tin và hoàn tất thủ tục đăng ký nhận tiền<br><br>" +
@@ -1012,5 +1012,6 @@ const huongdan = [
             "<strong>- Lưu file:</strong> Sau khi chỉnh sửa, hãy lưu lại file với định dạng .pptx để đảm bảo tương thích."
     }
 ];
+
 
 
