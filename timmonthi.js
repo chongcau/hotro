@@ -2,11 +2,23 @@ const EXAM_FILE_URL = 'https://raw.githubusercontent.com/nhattan28/lich_thi_DTU/
 
 let EXAM_DATA = [];
 let HEADERS = [];
-const KHOI_THI_HEADER_NAME = 'Khối thi';
-const MA_MON_HEADER_NAME = 'Mã môn';
-const MON_THI_HEADER_NAME = 'Môn thi';
+
+// CÁC HẰNG SỐ MỚI HOẶC ĐÃ ĐỔI TÊN ĐỂ PHÙ HỢP
+const STT_HEADER_NAME = 'STT';
+const THU_HEADER_NAME = 'Thứ';
 const NGAY_THI_HEADER_NAME = 'Ngày thi';
-const KEY_COLUMNS_TO_FIND = ['STT', 'Ngày thi', 'Mã môn', 'Môn thi'];
+const GIO_THI_HEADER_NAME = 'Giờ thi';
+const MA_MON_HEADER_NAME = 'Mã môn'; // Giữ lại Mã môn để tìm kiếm
+const MON_THI_HEADER_NAME = 'Môn thi';
+const HINHTHUC_HEADER_NAME = 'Hình thức thi';
+const KHOI_THI_HEADER_NAME = 'Khối thi';
+const DIA_DIEM_HEADER_NAME = 'Địa điểm';
+const KHOA_CHUTRI_HEADER_NAME = 'Khoa chủ trì';
+const GHICHU_HEADER_NAME = 'Ghi chú';
+const SL_SV_HEADER_NAME = 'SL SV'; // Cột thay thế Mã môn trong hiển thị
+
+// Thêm Mã ngành vào Key Columns dựa trên hình ảnh mới
+const KEY_COLUMNS_TO_FIND = [STT_HEADER_NAME, THU_HEADER_NAME, NGAY_THI_HEADER_NAME, MA_MON_HEADER_NAME, MON_THI_HEADER_NAME, 'Mã ngành'];
 
 // Tự động chạy hàm tải dữ liệu ngay khi trang web được mở
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,6 +29,8 @@ async function loadAndProcessFile(url) {
     if (!url || url === 'URL_FILE_EXCEL_CUA_BAN') {
         showModal('Lỗi Cấu Hình', 'Đường dẫn đến file lịch thi (EXAM_FILE_URL) chưa được thiết lập trong file `timmonthi.js`.', 'error', null, 0);
         document.querySelector('#resultTable tbody').innerHTML = `<tr><td colspan="100%">Lỗi cấu hình. Vui lòng liên hệ quản trị viên.</td></tr>`;
+        // Cập nhật thống kê khi lỗi
+        document.getElementById('resultStats').textContent = '0';
         return;
     }
 
@@ -44,6 +58,8 @@ async function loadAndProcessFile(url) {
         console.error("Lỗi khi tải hoặc xử lý file:", error);
         showModal('Tải Lịch Thi Thất Bại!', `Đã xảy ra lỗi: ${error.message}.<br>Vui lòng kiểm tra lại đường dẫn file trên GitHub hoặc thử tải lại trang.`, 'error', null, 0);
         document.querySelector('#resultTable tbody').innerHTML = `<tr><td colspan="100%">Tải dữ liệu thất bại.</td></tr>`;
+        // Cập nhật thống kê khi lỗi
+        document.getElementById('resultStats').textContent = '0';
     }
 }
 
@@ -58,11 +74,11 @@ function showModal(title, message, type = 'info', actions = null, duration = 0.0
     let icon = '';
     content.className = `modal-content modal-${type}`;
 
-    if (type === 'success') icon = '';
-    else if (type === 'error') icon = '';
-    else if (type === 'info') icon = '';
-    else if (type === 'warning') icon = '';
-    else if (type === 'confirm') icon = '';
+    if (type === 'success') icon = '✅';
+    else if (type === 'error') icon = '❌';
+    else if (type === 'info') icon = 'ℹ️';
+    else if (type === 'warning') icon = '⚠️';
+    else if (type === 'confirm') icon = '❓';
 
     document.getElementById('modalIcon').textContent = icon;
 
@@ -92,10 +108,9 @@ function hideModal() {
     document.getElementById('modalContainer').classList.remove('show');
 }
 
-// --- THAY ĐỔI: Hàm hiển thị xác nhận sao chép ---
 function showCopyConfirmModal() {
     const tableBody = document.querySelector('#resultTable tbody');
-    if (tableBody.children.length === 0 || tableBody.querySelector('td').textContent.includes('Chưa có dữ liệu')) {
+    if (tableBody.children.length === 0 || tableBody.querySelector('td').textContent.includes('Chưa có dữ liệu') || tableBody.querySelector('td').textContent.includes('Không tìm thấy') || tableBody.querySelector('td').textContent.includes('Tải dữ liệu thất bại')) {
         showModal('Không Có Dữ Liệu!', 'Không có dữ liệu để sao chép.', 'error');
         return;
     }
@@ -104,10 +119,9 @@ function showCopyConfirmModal() {
         { text: 'Xác Nhận', class: 'confirm', action: copyTableImageToClipboard },
         { text: 'Hủy', class: 'cancel', action: hideModal }
     ];
-    showModal('Xác Nhận Sao Chép', 'Bạn có muốn sao chép lịch thi này vào bộ nhớ tạm không?', 'confirm', actions, 0);
+    showModal('Xác Nhận Sao Chép', 'Bạn có muốn sao chép ảnh lịch thi này vào bộ nhớ tạm không?', 'confirm', actions, 0);
 }
 
-// --- THAY ĐỔI: Hàm xử lý chụp ảnh và copy vào clipboard ---
 function copyTableImageToClipboard() {
     const tableWrapper = document.getElementById('tableWrapper');
     const captureArea = document.getElementById('captureArea');
@@ -116,7 +130,6 @@ function copyTableImageToClipboard() {
 
     showModal('Đang Xử Lý...', 'Đang tạo ảnh và sao chép, vui lòng đợi...', 'info', null, 8000);
 
-    // 1. Lấy thời gian hiện tại và hiển thị Header
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -129,18 +142,14 @@ function copyTableImageToClipboard() {
 
     tableWrapper.classList.add('capturing');
     const originalScroll = tableWrapper.scrollTop;
-    // Cuộn lên đầu để chụp hết
     tableWrapper.scrollTop = 0;
 
-    // Đợi 1 chút để DOM cập nhật hiển thị header
     setTimeout(() => {
         html2canvas(captureArea, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-            // Ẩn lại header sau khi chụp xong
             exportHeader.style.display = 'none';
             tableWrapper.classList.remove('capturing');
             tableWrapper.scrollTop = originalScroll;
 
-            // Chuyển Canvas thành Blob để copy
             canvas.toBlob(function (blob) {
                 if (!blob) {
                     showModal('Lỗi!', 'Không tạo được ảnh.', 'error');
@@ -148,7 +157,6 @@ function copyTableImageToClipboard() {
                 }
 
                 try {
-                    // API ClipboardItem để ghi ảnh
                     const item = new ClipboardItem({ "image/png": blob });
                     navigator.clipboard.write([item]).then(() => {
                         showModal('Thành Công!', 'Đã sao chép ảnh lịch thi vào bộ nhớ tạm.<br>Bạn có thể dán (Paste) ngay bây giờ.', 'success');
@@ -169,7 +177,7 @@ function copyTableImageToClipboard() {
             console.error("Lỗi khi tạo ảnh:", error);
             showModal('Lỗi!', 'Không thể tạo hình ảnh. Vui lòng thử lại.', 'error');
         });
-    }, 150); // Delay nhẹ để render style
+    }, 150);
 }
 
 function excelSerialToJSDate(serial) {
@@ -242,7 +250,7 @@ function processExcelData(data) {
 
 function checkAndDisplayHeaders() {
     const headerKeys = new Set(HEADERS.map(h => normalizeHeaderName(h).toUpperCase()));
-    const requiredKeys = [KHOI_THI_HEADER_NAME, MA_MON_HEADER_NAME, MON_THI_HEADER_NAME, NGAY_THI_HEADER_NAME];
+    const requiredKeys = [MA_MON_HEADER_NAME, MON_THI_HEADER_NAME, NGAY_THI_HEADER_NAME];
     const missingCols = requiredKeys.filter(key => !headerKeys.has(key.toUpperCase()));
     if (missingCols.length > 0) {
         throw new Error(`File thiếu các cột quan trọng: ${missingCols.join(', ')}.`);
@@ -263,7 +271,9 @@ const splitSearchTerm = (term) => {
 };
 
 function searchData() {
+    const resultStats = document.getElementById('resultStats');
     if (EXAM_DATA.length === 0) {
+        resultStats.textContent = '0';
         displayResults([]);
         return;
     }
@@ -272,6 +282,7 @@ function searchData() {
     const rawTerms = rawSearchText.split(',').map(normalizeSearchString).filter(Boolean);
 
     if (rawTerms.length === 0) {
+        resultStats.textContent = `${EXAM_DATA.length}`;
         displayResults(EXAM_DATA);
         return;
     }
@@ -280,21 +291,44 @@ function searchData() {
     const KHOI_THI_KEY = getHeaderKey(KHOI_THI_HEADER_NAME);
     const MA_MON_KEY = getHeaderKey(MA_MON_HEADER_NAME);
     const MON_THI_KEY = getHeaderKey(MON_THI_HEADER_NAME);
+    const THU_KEY = getHeaderKey(THU_HEADER_NAME);
+    const NGAY_THI_KEY = getHeaderKey(NGAY_THI_HEADER_NAME);
+    const GIO_THI_KEY = getHeaderKey(GIO_THI_HEADER_NAME);
+    const DIA_DIEM_KEY = getHeaderKey(DIA_DIEM_HEADER_NAME);
+    const KHOA_CHUTRI_KEY = getHeaderKey(KHOA_CHUTRI_HEADER_NAME);
+    const MA_NGANH_KEY = HEADERS.find(h => normalizeHeaderName(h).toUpperCase().includes('MÃ NGÀNH'.toUpperCase())) || 'Mã ngành';
 
     let foundTerms = new Set();
     const filteredData = EXAM_DATA.filter(row => {
         const maMonValue = normalizeSearchString(row[MA_MON_KEY]);
         const monThiValue = normalizeSearchString(row[MON_THI_KEY]);
         const khoiThiRaw = normalizeSearchString(row[KHOI_THI_KEY]);
+        const thuValue = normalizeSearchString(row[THU_KEY]);
+        const ngayThiValue = normalizeSearchString(excelSerialToJSDate(row[NGAY_THI_KEY]));
+        const gioThiValue = normalizeSearchString(row[GIO_THI_KEY]);
+        const diaDiemValue = normalizeSearchString(row[DIA_DIEM_KEY]);
+        const khoaChuTriValue = normalizeSearchString(row[KHOA_CHUTRI_KEY]);
+        const maNganhValue = normalizeSearchString(row[MA_NGANH_KEY]);
+
 
         return rawTerms.some(searchTerm => {
             let matchFound = false;
             const { maMon: searchMaMon, khoiThi: searchKhoiThi } = splitSearchTerm(searchTerm);
 
-            if (monThiValue.includes(searchTerm) || maMonValue.includes(searchTerm)) {
+            // 1. Tìm kiếm theo Mã môn, Tên môn, Thứ, Ngày thi, Giờ thi, Địa điểm, Khoa chủ trì, Mã ngành
+            if (monThiValue.includes(searchTerm) ||
+                maMonValue.includes(searchTerm) ||
+                thuValue.includes(searchTerm) ||
+                ngayThiValue.includes(searchTerm) ||
+                gioThiValue.includes(searchTerm) ||
+                diaDiemValue.includes(searchTerm) ||
+                khoaChuTriValue.includes(searchTerm) ||
+                maNganhValue.includes(searchTerm) // Tìm kiếm theo Mã ngành
+            ) {
                 matchFound = true;
             }
 
+            // 2. Tìm kiếm kết hợp Mã môn và Khối thi (ví dụ: CS 462 A)
             if (!matchFound && searchKhoiThi && maMonValue.includes(searchMaMon)) {
                 const matchBracket = khoiThiRaw.match(/\((.*?)\)/);
                 if (matchBracket) {
@@ -310,6 +344,7 @@ function searchData() {
         });
     });
 
+    resultStats.textContent = `${filteredData.length}`;
     const notFoundTerms = new Set(rawTerms.filter(term => !foundTerms.has(term)));
     displayResults(filteredData, notFoundTerms, rawTerms);
 }
@@ -324,7 +359,10 @@ function displayResults(data, notFoundTerms = new Set(), searchTerms = []) {
     const KHOI_THI_KEY = getHeaderKey(KHOI_THI_HEADER_NAME);
     const MA_MON_KEY = getHeaderKey(MA_MON_HEADER_NAME);
     const MON_THI_KEY = getHeaderKey(MON_THI_HEADER_NAME);
+    const SL_SV_KEY = getHeaderKey(SL_SV_HEADER_NAME); // Lấy khóa SL SV
     const NGAY_THI_KEY = getHeaderKey(NGAY_THI_HEADER_NAME);
+    const MA_NGANH_KEY = HEADERS.find(h => normalizeHeaderName(h).toUpperCase().includes('MÃ NGÀNH'.toUpperCase())) || 'Mã ngành';
+
 
     tableHead.innerHTML = '';
     tableBody.innerHTML = '';
@@ -332,7 +370,14 @@ function displayResults(data, notFoundTerms = new Set(), searchTerms = []) {
     if (HEADERS.length > 0) {
         HEADERS.forEach(header => {
             const th = document.createElement('th');
-            th.textContent = header;
+            // HIỂN THỊ CỘT SL SV THAY CHO MÃ MÔN TRÊN HEADER
+            if (header === MA_MON_KEY) {
+                th.textContent = SL_SV_HEADER_NAME;
+            } else if (normalizeHeaderName(header).toUpperCase().includes('MÃ NGÀNH'.toUpperCase())) {
+                th.textContent = 'Mã ngành'; // Fix tiêu đề nếu cần
+            } else {
+                th.textContent = header;
+            }
             tableHead.appendChild(th);
         });
     }
@@ -352,7 +397,6 @@ function displayResults(data, notFoundTerms = new Set(), searchTerms = []) {
 
             searchTerms.forEach(term => {
                 const { maMon, khoiThi } = splitSearchTerm(term);
-
                 if ((rowMaMon.includes(maMon) || rowMonThi.includes(maMon)) && khoiThi) {
                     lettersForThisRow.add(khoiThi);
                 }
@@ -367,10 +411,20 @@ function displayResults(data, notFoundTerms = new Set(), searchTerms = []) {
                 const td = document.createElement('td');
                 let cellValue = row[header] || '';
 
+                // 1. Chuyển đổi ngày thi
                 if (header === NGAY_THI_KEY && typeof cellValue === 'number' && cellValue > 0) {
                     cellValue = excelSerialToJSDate(cellValue);
                 }
 
+                // 2. HIỂN THỊ CỘT SL SV THAY CHO MÃ MÔN TRONG DATA
+                if (header === MA_MON_KEY) {
+                    cellValue = row[SL_SV_KEY] || ''; // Lấy giá trị của SL SV
+                    td.textContent = cellValue;
+                    tr.appendChild(td);
+                    return;
+                }
+
+                // 3. Tô màu Khối thi
                 if (header === KHOI_THI_KEY && rowRegex) {
                     const textContent = String(cellValue);
                     td.innerHTML = textContent.replace(rowRegex, `<span class="highlight-khoithi">$1</span>`);
