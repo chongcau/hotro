@@ -38,8 +38,13 @@
         <div id="step2Container">
             <div id="searchSection">
                 <div class="search-input-group">
-                    <input type="text" id="searchTermInput" placeholder="Nhập Khối thi, Mã môn, hoặc Tên môn..."
-                        oninput="searchData()" autocomplete="off" autofocus />
+                    <div class="input-wrapper">
+                        <input type="text" id="searchTermInput"
+                            placeholder="Nhập Khối thi, Mã môn, Tên môn, Địa điểm, Thứ, Giờ thi..."
+                            oninput="searchData()" autocomplete="off" autofocus />
+                        <div id="resultStats">Đang tải...</div>
+                    </div>
+
                     <button class="copy-button" onclick="showCopyConfirmModal()">
                         Sao chép ảnh
                     </button>
