@@ -5,6 +5,11 @@ const generalInfo = [
         answer: "Chào bạn. Tôi có thể giúp gì cho bạn?"
     },
     {
+        keywords: ["qr", "ủng hộ", "quyen góp", "tài trợ"],
+        answer:
+            "<img src='/hotro-main/maqrtan.png' alt='Mã QR Quyên góp' style='width:350px; height:350px;'>"
+    },
+    {
         keywords: ["địa chỉ", "cơ sở", "ở đâu", "trường ở đâu", "địa điểm"],
         answer: "<strong>Đại học Duy Tân có nhiều cơ sở tại Đà Nẵng:</strong><br><br>" +
             "- 209 Phan Thanh, Thạc Gián, Thanh Khê<br><br>" +
@@ -1012,6 +1017,3 @@ const huongdan = [
             "<strong>- Lưu file:</strong> Sau khi chỉnh sửa, hãy lưu lại file với định dạng .pptx để đảm bảo tương thích."
     }
 ];
-
-
-
